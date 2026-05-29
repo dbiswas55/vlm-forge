@@ -17,7 +17,7 @@ from transformers import (
 # ---------------------------------------------------------------------------
 # The only two lines you change to swap models.
 # ---------------------------------------------------------------------------
-MODEL_ID = "google/gemma-3-4b-it"
+MODEL_ID = os.environ.get("MODEL_ID", "google/gemma-3-4b-it")
 ModelClass = Gemma3ForConditionalGeneration
 
 

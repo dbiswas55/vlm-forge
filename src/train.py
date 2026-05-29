@@ -11,6 +11,8 @@ The LoRA adapter is saved to outputs/gemma3-4b-chartqa-qlora/.
 """
 from __future__ import annotations
 
+import os
+
 from datasets import load_dataset
 from peft import LoraConfig
 from trl import SFTConfig, SFTTrainer
@@ -22,7 +24,11 @@ from src.utils import (
     load_model_and_processor,
 )
 
-OUTPUT_DIR = "outputs/gemma3-4b-chartqa-qlora"
+# Output dir and batch sizes are env-overridable so you can swap models
+# (e.g. 12B) without editing code. Defaults reproduce the original 4B run.
+OUTPUT_DIR = os.environ.get("OUTPUT_DIR", "outputs/gemma3-4b-chartqa-qlora")
+PER_DEVICE_TRAIN_BATCH_SIZE = int(os.environ.get("PER_DEVICE_TRAIN_BATCH_SIZE", "4"))
+GRADIENT_ACCUMULATION_STEPS = int(os.environ.get("GRADIENT_ACCUMULATION_STEPS", "4"))
 
 
 def main() -> None:
@@ -78,9 +84,9 @@ def main() -> None:
     cfg = SFTConfig(
         output_dir=OUTPUT_DIR,
         num_train_epochs=1,
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
-        gradient_accumulation_steps=4,
+        per_device_train_batch_size=PER_DEVICE_TRAIN_BATCH_SIZE,
+        per_device_eval_batch_size=PER_DEVICE_TRAIN_BATCH_SIZE,
+        gradient_accumulation_steps=GRADIENT_ACCUMULATION_STEPS,
         learning_rate=2e-4,
         warmup_ratio=0.03,
         lr_scheduler_type="cosine",

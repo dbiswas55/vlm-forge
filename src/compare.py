@@ -89,9 +89,15 @@ def main() -> None:
 
     # ------------------------------------------------------------------
     # (a) Base model — no adapter
+    # Read the base model id from the adapter config so the base ALWAYS
+    # matches the adapter (a 12B adapter on a 4B base would be meaningless).
     # ------------------------------------------------------------------
-    print(f"[1/2] Loading base model {MODEL_ID} (4-bit, no adapter)")
-    model, processor = load_model_and_processor(quantize=True, use_flash_attn=False)
+    with open(os.path.join(args.adapter_dir, "adapter_config.json")) as f:
+        base_model_id = json.load(f).get("base_model_name_or_path", MODEL_ID)
+    print(f"[1/2] Loading base model {base_model_id} (4-bit, no adapter)")
+    model, processor = load_model_and_processor(
+        model_id=base_model_id, quantize=True, use_flash_attn=False
+    )
     model.eval()
     base_preds = run_model(model, processor, ds, args.max_new_tokens)
 
@@ -140,7 +146,7 @@ def main() -> None:
     base_acc = base_correct / n if n else 0.0
     ft_acc = ft_correct / n if n else 0.0
     summary = {
-        "model_id": MODEL_ID,
+        "model_id": base_model_id,
         "adapter_dir": args.adapter_dir,
         "split": args.split,
         "num_samples": n,
