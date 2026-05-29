@@ -63,7 +63,7 @@ def generate_answer(model, processor, image, question: str,
          "content": [{"type": "text", "text": SYSTEM_PROMPT}]},
         {"role": "user",
          "content": [
-             {"type": "image", "image": image},
+             {"type": "image"},   # placeholder; image passed via processor images=
              {"type": "text", "text": question},
          ]},
     ]

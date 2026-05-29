@@ -5,6 +5,8 @@ The rest of the pipeline is generic.
 """
 from __future__ import annotations
 
+import os
+
 import torch
 from transformers import (
     AutoProcessor,
@@ -39,7 +41,12 @@ def load_model_and_processor(
         quantization_config=quantization_config,
     )
     if quantization_config is not None:
-        kwargs["device_map"] = "auto"   # required for multi-shard 4-bit loading
+        # Under `accelerate launch` (DDP), each process must load the full model
+        # onto its own GPU — `device_map="auto"` would make every process shard
+        # across all GPUs and collide. Pin to LOCAL_RANK when it is set; fall
+        # back to "auto" for single-process runs (`python -m src.train`).
+        local_rank = os.environ.get("LOCAL_RANK")
+        kwargs["device_map"] = {"": int(local_rank)} if local_rank is not None else "auto"
     if use_flash_attn:
         kwargs["attn_implementation"] = "flash_attention_2"
 
