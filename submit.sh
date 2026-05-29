@@ -17,7 +17,14 @@ source /project/subhlok/dipayan/my_envs/venv312/bin/activate
 
 mkdir -p logs
  
-export HF_TOKEN="REPLACE_WITH_YOUR_TOKEN"
+# Load secrets from .env (gitignored) — copy .env.example to .env and fill in values
+if [ -f .env ]; then
+    set -a; source .env; set +a
+else
+    echo "ERROR: .env file not found. Copy .env.example to .env and fill in your tokens."
+    exit 1
+fi
+
 export HF_HOME="/project/subhlok/dipayan/hf_cache"
 export TOKENIZERS_PARALLELISM=false
 export TRANSFORMERS_VERBOSITY=warning

@@ -21,6 +21,9 @@ logs/
 .cache/
 hf_cache/
  
+# Secrets — never commit the real .env
+.env
+
 # Editor
 .vscode/
 .idea/
