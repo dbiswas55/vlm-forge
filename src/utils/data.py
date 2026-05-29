@@ -20,7 +20,7 @@ def format_example(example: dict, include_answer: bool = True) -> dict:
          "content": [{"type": "text", "text": SYSTEM_PROMPT}]},
         {"role": "user",
          "content": [
-             {"type": "image", "image": example["image"]},
+             {"type": "image"},   # image kept as a separate dataset column, not embedded here
              {"type": "text", "text": example["query"]},
          ]},
     ]
@@ -42,15 +42,12 @@ def build_collator(processor, max_length: int = 2048):
     def collate(examples):
         texts, images = [], []
         for ex in examples:
-            msgs = ex["messages"]
             texts.append(
                 processor.apply_chat_template(
-                    msgs, tokenize=False, add_generation_prompt=False
+                    ex["messages"], tokenize=False, add_generation_prompt=False
                 )
             )
-            imgs = [c["image"] for m in msgs for c in m["content"]
-                    if c["type"] == "image"]
-            images.append(imgs)
+            images.append([ex["image"]])   # PIL Image from preserved dataset column
 
         batch = processor(
             text=texts,

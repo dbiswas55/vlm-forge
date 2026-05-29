@@ -48,7 +48,7 @@ def main() -> None:
          "content": [{"type": "text", "text": SYSTEM_PROMPT}]},
         {"role": "user",
          "content": [
-             {"type": "image", "image": image},
+             {"type": "image"},   # placeholder; image passed via processor images=
              {"type": "text", "text": args.question},
          ]},
     ]

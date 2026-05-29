@@ -34,10 +34,11 @@ def main() -> None:
     train_ds = raw["train"]
     eval_ds = raw["val"].select(range(500))     # small eval for speed
 
-    train_ds = train_ds.map(format_example,
-                            remove_columns=train_ds.column_names)
-    eval_ds = eval_ds.map(format_example,
-                          remove_columns=eval_ds.column_names)
+    # Keep the "image" column — removing it causes PIL→dict serialization issues
+    drop = [c for c in train_ds.column_names if c != "image"]
+    train_ds = train_ds.map(format_example, remove_columns=drop)
+    drop = [c for c in eval_ds.column_names if c != "image"]
+    eval_ds = eval_ds.map(format_example, remove_columns=drop)
 
     print(f"train: {len(train_ds)}  eval: {len(eval_ds)}")
 
@@ -91,7 +92,7 @@ def main() -> None:
         save_strategy="epoch",
         eval_strategy="steps",
         eval_steps=200,
-        report_to="wandb",                  # set to "none" to disable
+        report_to="wandb",
         max_length=None,                    # CRITICAL for VLMs
         remove_unused_columns=False,
         dataset_kwargs={"skip_prepare_dataset": True},

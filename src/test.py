@@ -42,8 +42,11 @@ def main() -> int:
     train_ds = load_dataset("HuggingFaceM4/ChartQA", split="train[:32]")
     eval_ds = load_dataset("HuggingFaceM4/ChartQA", split="val[:8]")
 
-    train_ds = train_ds.map(format_example, remove_columns=train_ds.column_names)
-    eval_ds = eval_ds.map(format_example, remove_columns=eval_ds.column_names)
+    # Keep the "image" column — removing it causes PIL→dict serialization issues
+    drop = [c for c in train_ds.column_names if c != "image"]
+    train_ds = train_ds.map(format_example, remove_columns=drop)
+    drop = [c for c in eval_ds.column_names if c != "image"]
+    eval_ds = eval_ds.map(format_example, remove_columns=drop)
 
     # 2) Load model + processor (4-bit)
     print("[test] Loading model (4-bit QLoRA)...")

@@ -35,14 +35,16 @@ def load_model_and_processor(
         )
 
     kwargs = dict(
-        torch_dtype=torch.bfloat16,
+        dtype=torch.bfloat16,
         quantization_config=quantization_config,
     )
+    if quantization_config is not None:
+        kwargs["device_map"] = "auto"   # required for multi-shard 4-bit loading
     if use_flash_attn:
         kwargs["attn_implementation"] = "flash_attention_2"
 
     model = ModelClass.from_pretrained(model_id, **kwargs)
-    processor = AutoProcessor.from_pretrained(model_id)
+    processor = AutoProcessor.from_pretrained(model_id, use_fast=True)
     return model, processor
 
 
