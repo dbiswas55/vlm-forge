@@ -1,0 +1,27 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+ 
+# Training outputs (keep the folder, ignore contents)
+outputs/*
+!outputs/.gitkeep
+ 
+# Logs and run artifacts
+runs/
+wandb/
+logs/
+*.log
+ 
+# HF cache (in case someone sets HF_HOME locally)
+.cache/
+hf_cache/
+ 
+# Editor
+.vscode/
+.idea/
+.DS_Store
