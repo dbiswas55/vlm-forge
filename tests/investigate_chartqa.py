@@ -81,7 +81,7 @@ def main():
     print("="*60)
     
     val_split = dataset["val"]
-    num_examples_to_show = 5
+    num_examples_to_show = 10
     
     # Pick random indices
     random_indices = random.sample(range(len(val_split)), k=num_examples_to_show)
