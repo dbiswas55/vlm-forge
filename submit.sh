@@ -62,4 +62,9 @@ if [ "$NUM_GPUS" -gt 1 ]; then
 else
     python -m src.train
 fi
- 
+
+
+# echo "Running evaluation..."
+# python -m src.evaluate \
+#     --adapter_dir outputs/gemma3-4b-chartqa-qlora \
+#     --num_samples 500

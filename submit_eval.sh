@@ -6,7 +6,7 @@
 #SBATCH --mail-type=FAIL,END
 #SBATCH -t 02:00:00
 #SBATCH --ntasks-per-node=1 -N 1
-#SBATCH --mem=64GB
+#SBATCH --mem=16GB
 #SBATCH --gpus-per-node=ada:1
 
 cd /project/subhlok/dipayan/vlm-forge
@@ -27,11 +27,19 @@ export TOKENIZERS_PARALLELISM=false
 export TRANSFORMERS_VERBOSITY=warning
 
 # Evaluation knobs — override on the command line if you like:
-#   sbatch submit_eval.sh outputs/gemma3-4b-chartqa-qlora test 1000
-ADAPTER_DIR=${1:-outputs/gemma3-4b-chartqa-qlora}
+#   sbatch submit_eval.sh outputs/gemma3-12b-chartqa-qlora test 1000
+# The base model is NOT taken from MODEL_ID here — src.compare reads it from the
+# adapter's adapter_config.json, so it always matches the adapter you point at.
+#   4B  adapter: outputs/gemma3-4b-chartqa-qlora
+#   12B adapter: outputs/gemma3-12b-chartqa-qlora  (matches OUTPUT_DIR in submit.sh)
+ADAPTER_DIR=${1:-outputs/gemma3-12b-chartqa-qlora}
 SPLIT=${2:-test}
 NUM_SAMPLES=${3:-500}
-OUT_DIR=${4:-outputs/eval_compare}
+# Keep results separate per model variation so a new run never overwrites an old
+# one. The adapter dir name already encodes the model (gemma3-4b / gemma3-12b),
+# so derive the tag from it: outputs/eval_compare/gemma3-12b-chartqa-qlora/...
+MODEL_TAG=$(basename "$ADAPTER_DIR")
+OUT_DIR=${4:-outputs/eval_compare/$MODEL_TAG}
 
 nvidia-smi --query-gpu=name,memory.total --format=csv
 
